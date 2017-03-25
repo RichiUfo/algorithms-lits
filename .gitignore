@@ -1,0 +1,5 @@
+*.pdf
+.directory 
+
+*.out
+*.byebug_history
