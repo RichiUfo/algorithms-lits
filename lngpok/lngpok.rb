@@ -1,5 +1,3 @@
-require 'byebug'
-
 def place_sequence(sequences_id, index)
   sequences = ObjectSpace._id2ref(sequences_id)
   i = index
