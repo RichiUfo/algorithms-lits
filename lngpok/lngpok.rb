@@ -1,91 +1,51 @@
-def place_sequence(sequences_id, index)
-  sequences = ObjectSpace._id2ref(sequences_id)
-  i = index
-  while i >= 0
-    if sequences[index].length == sequences[i].length || i.zero?
-      swap_sequences(sequences_id, i, index)
-    end
-    i -= 1
-  end
-end
-
-def swap_sequences(sequences_id, i, j)
-  sequences = ObjectSpace._id2ref(sequences_id)
-  tmp = sequences[i]
-  sequences[i] = sequences[j]
-  sequences[j] = tmp
-end
-
 input_file = "#{File.dirname(__FILE__)}/lngpok.in"
 output_file = "#{File.dirname(__FILE__)}/lngpok.out"
-cards = File.open(input_file).readline.split(' ').map(&:to_i)
+cards = File.open(input_file).readline.split(' ').map(&:to_i).sort!
 
 sequences = []
 jokers_count = 0
 max_sequence_length = 0
 
-cards.each do |element|
-  if element.zero?
-    jokers_count += 1
-    next
+cards.each { |card| card.zero? ? jokers_count += 1 : break }
+cards.shift(jokers_count)
+cards.uniq!
+
+previous_card = nil
+cards.each do |card|
+  if card - 1 != previous_card
+    sequences << [card]
+  else
+    sequences.last << card
   end
 
-  if sequences.empty?
-    sequences.push [element]
-    next
-  end
-
-  sequences.each_with_index do |sequence, i|
-    # if the same elements is already in sequence
-    break if element >= sequence.first && element <= sequence.last
-
-    unless element + 1 == sequence.first || element - 1 == sequence.last
-      next unless i == sequences.length - 1
-
-      sequences.push [element]
-      break
-    end
-
-    if element + 1 == sequence.first
-      sequence.unshift element
-    elsif element - 1 == sequence.last
-      sequence << element
-    end
-
-    if sequences[i - 1].length < sequence.length
-      place_sequence(sequences.object_id, i)
-    end
-
-    break
-  end
+  previous_card = card
 end
 
-sequences.each_with_index do |sequence, i|
-  jokers_left = jokers_count
-  min = sequence.first
-  max = sequence.last
-  length = sequence.length
+last_index = sequences.length - 1
+sequences.each_index do |i|
+  jcount = jokers_count
+  sq_length = 0
+  loop do
+    break if i >= last_index
+    sq_diff = (sequences[i + 1].first - sequences[i].last) - 1
+    break if sq_diff > jcount
 
-  sequences.each_with_index do |inner_sequence, j|
-    next if i == j
-
-    end_discrepancy = inner_sequence.first - max - 1
-    start_discrepancy = min - inner_sequence.last - 1
-
-    if end_discrepancy.positive? && end_discrepancy <= jokers_left
-      jokers_left -= end_discrepancy
-      max = inner_sequence.last
-      length += end_discrepancy + inner_sequence.length
-    elsif start_discrepancy.positive? && start_discrepancy <= jokers_left
-      jokers_left -= start_discrepancy
-      min = inner_sequence.first
-      length += start_discrepancy + inner_sequence.length
-    end
+    sq_length += sequences[i].length if sq_length.zero?
+    sq_length += sq_diff + sequences[i + 1].length
+    jcount -= sq_diff
+    i += 1
   end
 
-  length += length if jokers_left.positive?
-  max_sequence_length = length if length > max_sequence_length
+  max_sequence_length = if sq_length > max_sequence_length
+                          sq_length + (jcount > 0 ? jcount : 0)
+                        elsif sequences[i].length > max_sequence_length
+                          sequences[i].length + (jcount > 0 ? jcount : 0)
+                        else
+                          max_sequence_length
+                        end
 end
+
+max_sequence_length = jokers_count if sequences.empty?
 
 open(output_file, 'w') do |f|
   f << "#{max_sequence_length}\n"
