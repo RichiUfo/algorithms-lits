@@ -1,4 +1,3 @@
-require 'byebug'
 input_file = "#{File.dirname(__FILE__)}/hamstr.in"
 output_file = "#{File.dirname(__FILE__)}/hamstr.out"
 
