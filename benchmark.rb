@@ -10,7 +10,7 @@ out_file = "#{file_path}.out"
 abort("#{executable_file} not found") unless File.exist?(executable_file)
 
 Benchmark.bm do |x|
-  (1..10).each do |n|
+  (1..12).each do |n|
     data_num = n.to_s.rjust(2, '0')
     input_data = Net::HTTP.get(
       '80.254.55.156',
@@ -25,7 +25,6 @@ Benchmark.bm do |x|
       `ruby #{executable_file}`
     end
 
-    # puts input_data
     puts "#{data_num}.answer - #{File.read(out_file)}"
   end
 end

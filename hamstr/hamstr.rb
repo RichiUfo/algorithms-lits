@@ -19,8 +19,23 @@ def min_consumption_for_hamsters_count(hamsters, count)
   consumptions.min(count).sum
 end
 
+left = 0
+right = max_hamsters_count
 hamsters_count = 0
-(1..max_hamsters_count).each do |h_count|
+while right - left > 2
+  hamsters_count = ((left + right).to_f / 2).ceil
+
+  min_consumption = min_consumption_for_hamsters_count(hamsters, hamsters_count)
+  if min_consumption > food
+    right = hamsters_count % 2 ? hamsters_count : hamsters_count + 1
+  elsif min_consumption < food
+    left = hamsters_count % 2 ? hamsters_count : hamsters_count - 1
+  else
+    break
+  end
+end
+
+(left..right).each do |h_count|
   consumption = min_consumption_for_hamsters_count(hamsters, h_count)
   break if consumption > food
   hamsters_count = h_count
