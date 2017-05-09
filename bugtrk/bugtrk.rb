@@ -1,4 +1,3 @@
-require 'byebug'
 input_file = "#{File.dirname(__FILE__)}/bugtrk.in"
 output_file = "#{File.dirname(__FILE__)}/bugtrk.out"
 
